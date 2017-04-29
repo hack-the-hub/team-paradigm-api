@@ -96,3 +96,9 @@ ENV/
 
 # mkdocs documentation
 /site
+
+# pycharm ide
+.idea
+
+# virtual-env
+api-env/
