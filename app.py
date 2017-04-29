@@ -1,36 +1,30 @@
-from flask import Flask, jsonify
+import os
 
-from events import events_api
-from locations import locations_api
-from routes import routes_api
-from users import users_api
+import tornado.httpclient
+import tornado.httpserver
+import tornado.ioloop
+import tornado.options
+import tornado.web
+from pyrestful import rest
 
-app = Flask(__name__)
+from health import health_v1_http
 
+tornado.options.define('port', type=int, default=8000, help='server port number (default: 8000)')
+tornado.options.define('debug', type=bool, default=True, help='run in debug mode with autoreload (default: False)')
 
-@app.route('/bt/api/v1/events', methods=['GET'])
-def get_events():
-    events = events_api.get_events()
-    return jsonify({'events': events})
+root = os.path.dirname(__file__)
 
-
-@app.route('/bt/api/v1/locations', methods=['GET'])
-def get_locations():
-    locations = locations_api.get_locations()
-    return jsonify({'locations': locations})
-
-
-@app.route('/bt/api/v1/routes', methods=['GET'])
-def get_routes():
-    routes = routes_api.get_routes()
-    return jsonify({'routes': routes})
+application = rest.RestService([
+    health_v1_http.HealthResource
+])
 
 
-@app.route('/bt/api/v1/users', methods=['GET'])
-def get_users():
-    users = users_api.get_users()
-    return jsonify({'users': users})
+def main():
+    tornado.options.parse_command_line()
+    http_server = tornado.httpserver.HTTPServer(application)
+    http_server.listen(tornado.options.options.port)
+    tornado.ioloop.IOLoop.instance().start()
 
 
-if __name__ == '__main__':
-    app.run(debug=True)
+if __name__ == "__main__":
+    main()
