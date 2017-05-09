@@ -1,36 +1,25 @@
-from flask import Flask, jsonify
-
-from events import events_api
-from locations import locations_api
-from routes import routes_api
-from users import users_api
+from flask import Flask
+import sys
+import optparse
+import time
 
 app = Flask(__name__)
 
-
-@app.route('/bt/api/v1/events', methods=['GET'])
-def get_events():
-    events = events_api.get_events()
-    return jsonify({'events': events})
+start = int(round(time.time()))
 
 
-@app.route('/bt/api/v1/locations', methods=['GET'])
-def get_locations():
-    locations = locations_api.get_locations()
-    return jsonify({'locations': locations})
-
-
-@app.route('/bt/api/v1/routes', methods=['GET'])
-def get_routes():
-    routes = routes_api.get_routes()
-    return jsonify({'routes': routes})
-
-
-@app.route('/bt/api/v1/users', methods=['GET'])
-def get_users():
-    users = users_api.get_users()
-    return jsonify({'users': users})
+@app.route("/")
+def hello_world():
+    return "Hello world!"
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    parser = optparse.OptionParser(usage="python simpleapp.py -p ")
+    parser.add_option('-p', '--port', action='store', dest='port', help='The port to listen on.')
+    (args, _) = parser.parse_args()
+
+    if args.port == None:
+        print("Missing required argument: -p/--port")
+        sys.exit(1)
+
+    app.run(host='0.0.0.0', port=int(args.port), debug=False)
